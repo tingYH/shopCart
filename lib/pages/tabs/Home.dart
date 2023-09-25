@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:shopCart/services/ScreenAdapter.dart';
 
@@ -70,7 +69,7 @@ class _HomePageState extends State<HomePage> {
               Container(
                 height: ScreenAdapter.height(140),
                 width: ScreenAdapter.width(140),
-                margin: EdgeInsets.only(right:  ScreenAdapter.width(10)),
+                margin: EdgeInsets.only(right: ScreenAdapter.width(10)),
                 child: Image.network(
                   "https://www.itying.com/images/flutter/hot${index + 1}.jpg",
                   fit: BoxFit.cover,
@@ -89,6 +88,63 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //推荐商品
+  _recProductItemWidget() {
+    var itemWidth = (ScreenAdapter.getScreenWidth() - 30) / 2;
+    return Container(
+      padding: EdgeInsets.all(10),
+      width: itemWidth,
+      decoration: BoxDecoration(
+        border: Border.all(color: Color.fromRGBO(233, 233, 233, 0.9), width: 1),
+      ),
+      child: Column(children: <Widget>[
+        Container(
+          width: double.infinity,
+          child: AspectRatio(  //防止服务器返回的图片大小不一致导致高度不一致问题
+            aspectRatio: 1 / 1,
+            child: Image.network(
+              "https://www.itying.com/images/flutter/list1.jpg",
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: ScreenAdapter.height(10)),
+          child: Text(
+            "asdsadasdasdsadsad2222222222222222sadasdasd",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.black54),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
+          child: Stack(
+            children: <Widget>[
+              Align(
+                child: Text(
+                  "NT 123",
+                  style: TextStyle(color: Colors.red, fontSize: 16),
+                ),
+                alignment: Alignment.centerLeft,
+              ),
+              Align(
+                child: Text(
+                  "NT 500",
+                  style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14,
+                      decoration: TextDecoration.lineThrough),
+                ),
+                alignment: Alignment.centerRight,
+              ),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
@@ -103,10 +159,23 @@ class _HomePageState extends State<HomePage> {
           height: ScreenAdapter.height(20),
         ),
         _hotProductListWidget(),
-        SizedBox(
-          height: ScreenAdapter.height(20),
-        ),
         _titleWidget("热门推荐"),
+        Container(
+          padding: EdgeInsets.all(10),
+          child: Wrap(
+            runSpacing: 10,
+            spacing: 10,
+            children: <Widget>[
+              _recProductItemWidget(),
+              _recProductItemWidget(),
+              _recProductItemWidget(),
+              _recProductItemWidget(),
+              _recProductItemWidget(),
+              _recProductItemWidget(),
+              _recProductItemWidget(),
+            ],
+          ),
+        ),
       ],
     );
   }
