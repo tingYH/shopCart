@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:dio/dio.dart';
+
+//轮播图类模型
+import 'package:shopCart/model/FocusModel.dart';
 import 'package:shopCart/services/ScreenAdapter.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,29 +15,63 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List _focusData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // var strData='{"_id":"59f6ef443ce1fb0fb02c7a43","title":"笔记本电脑 ","status":"1","url":"12"}';
+    //
+    // var data = FocusModel.fromJson(json.decode(strData));
+    _getFocusData();
+  }
+
+
+  _getFocusData() async {
+    var api = 'https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1';
+    final response = await Dio().get(api);
+    print(response.data is Map);
+    var result = FocusModel.fromJson(response.data);
+
+    print(result);
+    result.images?.forEach((element) {
+      print(element.title);
+      print(element.url);
+      print(element.copyrightlink);
+      _focusData.add(element.url);
+    });
+    setState(() {
+      _focusData;
+    });
+  }
+
   //轮播图
   Widget _swiperWidget() {
-    List<Map> imgList = [
-      {"url": "https://www.itying.com/images/flutter/slide01.jpg"},
-      {"url": "https://www.itying.com/images/flutter/slide02.jpg"},
-      {"url": "https://www.itying.com/images/flutter/slide03.jpg"},
-    ];
-    return Container(
-      child: AspectRatio(
-        aspectRatio: 2 / 1,
-        child: Swiper(
-          itemBuilder: (BuildContext context, int index) {
-            return Image.network(
-              imgList[index]["url"],
-              fit: BoxFit.fill,
-            );
-          },
-          itemCount: imgList.length,
-          pagination: new SwiperPagination(),
-          autoplay: true,
+    if (_focusData.length > 0) {
+      // List<Map> imgList = [
+      //   {"url": "https://www.itying.com/images/flutter/slide01.jpg"},
+      //   {"url": "https://www.itying.com/images/flutter/slide02.jpg"},
+      //   {"url": "https://www.itying.com/images/flutter/slide03.jpg"},
+      // ];
+      return Container(
+        child: AspectRatio(
+          aspectRatio: 2 / 1,
+          child: Swiper(
+            itemBuilder: (BuildContext context, int index) {
+              return Image.network(
+               "https://cn.bing.com/${this._focusData[index]}" ,
+                fit: BoxFit.fill,
+              );
+            },
+            itemCount: this._focusData.length,
+            pagination: new SwiperPagination(),
+            autoplay: true,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Text('加载中');
+    }
   }
 
   Widget _titleWidget(value) {
@@ -100,7 +140,8 @@ class _HomePageState extends State<HomePage> {
       child: Column(children: <Widget>[
         Container(
           width: double.infinity,
-          child: AspectRatio(  //防止服务器返回的图片大小不一致导致高度不一致问题
+          child: AspectRatio(
+            //防止服务器返回的图片大小不一致导致高度不一致问题
             aspectRatio: 1 / 1,
             child: Image.network(
               "https://www.itying.com/images/flutter/list1.jpg",

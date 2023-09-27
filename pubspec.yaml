@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_swiper: ^1.1.6
   flutter_screenutil: ^0.5.3
+  dio: ^5.3.3
 
 dev_dependencies:
   flutter_test:
