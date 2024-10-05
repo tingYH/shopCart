@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
     //
     // var data = FocusModel.fromJson(json.decode(strData));
     _getFocusData();
-
     _getHotProductData();
   }
 
