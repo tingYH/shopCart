@@ -1,9 +1,9 @@
-class FocusModel {
+class ProductModel {
   List<Result>? result;
 
-  FocusModel({this.result});
+  ProductModel({this.result});
 
-  FocusModel.fromJson(Map<String, dynamic> json) {
+  ProductModel.fromJson(Map<String, dynamic> json) {
     if (json['result'] != null) {
       result = <Result>[];
       json['result'].forEach((v) {
@@ -24,27 +24,40 @@ class FocusModel {
 class Result {
   String? sId;
   String? title;
-  String? status;
+  String? cid;
+  int? price;
+  String? oldPrice;
   String? pic;
-  String? url;
+  String? sPic;
 
-  Result({this.sId, this.title, this.status, this.pic, this.url});
+  Result(
+      {this.sId,
+      this.title,
+      this.cid,
+      this.price,
+      this.oldPrice,
+      this.pic,
+      this.sPic});
 
   Result.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     title = json['title'];
-    status = json['status'];
+    cid = json['cid'];
+    price = json['price'];
+    oldPrice = json['old_price'];
     pic = json['pic'];
-    url = json['url'];
+    sPic = json['s_pic'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['_id'] = this.sId;
     data['title'] = this.title;
-    data['status'] = this.status;
+    data['cid'] = this.cid;
+    data['price'] = this.price;
+    data['old_price'] = this.oldPrice;
     data['pic'] = this.pic;
-    data['url'] = this.url;
+    data['s_pic'] = this.sPic;
     return data;
   }
 }

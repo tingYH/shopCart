@@ -1,11 +1,11 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:dio/dio.dart';
+import 'package:shopCart/config/Config.dart';
 
 //轮播图类模型
 import 'package:shopCart/model/FocusModel.dart';
+import 'package:shopCart/model/ProductModel.dart';
 import 'package:shopCart/services/ScreenAdapter.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,6 +16,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List _focusData = [];
+  List _hotProductData = [];
+  List _hotProductStrData = [];
 
   @override
   void initState() {
@@ -24,42 +26,52 @@ class _HomePageState extends State<HomePage> {
     //
     // var data = FocusModel.fromJson(json.decode(strData));
     _getFocusData();
+
+    _getHotProductData();
   }
 
-
   _getFocusData() async {
-    var api = 'https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1';
+    var api = Config.domain + 'api/focus';
     final response = await Dio().get(api);
     print(response.data is Map);
     var result = FocusModel.fromJson(response.data);
 
-    print(result);
-    result.images?.forEach((element) {
-      print(element.title);
-      print(element.url);
-      print(element.copyrightlink);
-      _focusData.add(element.url);
+    result.result?.forEach((element) {
+      _focusData.add(element.pic?.replaceAll("\\", "/"));
     });
     setState(() {
       _focusData;
     });
   }
 
+  //获取猜你禧欢数据
+  _getHotProductData() async {
+    var api = Config.domain + 'api/plist?is_hot=1';
+    final response = await Dio().get(api);
+    print(response.data is Map);
+    var hotProdcutList = ProductModel.fromJson(response.data);
+
+    hotProdcutList.result?.forEach((element) {
+      _hotProductData.add(element.pic?.replaceAll("\\", "/"));
+      _hotProductStrData.add(element.price);
+    });
+    setState(() {
+      _hotProductData;
+      _hotProductStrData;
+    });
+  }
+
   //轮播图
   Widget _swiperWidget() {
     if (_focusData.length > 0) {
-      // List<Map> imgList = [
-      //   {"url": "https://www.itying.com/images/flutter/slide01.jpg"},
-      //   {"url": "https://www.itying.com/images/flutter/slide02.jpg"},
-      //   {"url": "https://www.itying.com/images/flutter/slide03.jpg"},
-      // ];
       return Container(
         child: AspectRatio(
           aspectRatio: 2 / 1,
           child: Swiper(
             itemBuilder: (BuildContext context, int index) {
+              String url = "${Config.domain}${this._focusData[index]}";
               return Image.network(
-               "https://cn.bing.com/${this._focusData[index]}" ,
+                url,
                 fit: BoxFit.fill,
               );
             },
@@ -98,34 +110,41 @@ class _HomePageState extends State<HomePage> {
 
   //热门商品
   Widget _hotProductListWidget() {
-    return Container(
-      height: ScreenAdapter.height(230),
-      padding: EdgeInsets.all(ScreenAdapter.width(20)),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return Column(
-            children: <Widget>[
-              Container(
-                height: ScreenAdapter.height(140),
-                width: ScreenAdapter.width(140),
-                margin: EdgeInsets.only(right: ScreenAdapter.width(10)),
-                child: Image.network(
-                  "https://www.itying.com/images/flutter/hot${index + 1}.jpg",
-                  fit: BoxFit.cover,
+    if (this._hotProductData.length > 0) {
+      return Container(
+        height: ScreenAdapter.height(230),
+        padding: EdgeInsets.all(ScreenAdapter.width(20)),
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            return Column(
+              children: <Widget>[
+                Container(
+                  height: ScreenAdapter.height(140),
+                  width: ScreenAdapter.width(140),
+                  margin: EdgeInsets.only(right: ScreenAdapter.width(10)),
+                  child: Image.network(
+                    Config.domain + _hotProductData[index],
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.only(top: ScreenAdapter.height(10)),
-                height: ScreenAdapter.height(44),
-                child: Text("第$index条"),
-              )
-            ],
-          );
-        },
-        itemCount: 10,
-      ),
-    );
+                Container(
+                  padding: EdgeInsets.only(top: ScreenAdapter.height(10)),
+                  height: ScreenAdapter.height(44),
+                  child: Text(
+                    "NT "+_hotProductStrData[index].toString(),
+                    style: TextStyle(color: Colors.red),
+                  ),
+                )
+              ],
+            );
+          },
+          itemCount: _hotProductData.length,
+        ),
+      );
+    } else {
+      return Text('加载中');
+    }
   }
 
   //推荐商品
